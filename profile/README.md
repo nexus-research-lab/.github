@@ -3,77 +3,50 @@
 </p>
 
 <p align="center">
-  <strong>Nexus: the AI-centered hub that reconnects the full software-development chain end to end</strong>
+  <strong>Nexus is the AI-centered hub reconnecting the full software-development chain.</strong>
 </p>
 
 <p align="center">
-  Break fragmented software workflows and explore a new mode of human-AI co-creation.
+  From requirements to operations, we study how human judgment and AI execution work as one system.
 </p>
 
 <p align="center">
   <a href="https://github.com/nexus-research-lab/.github/blob/main/profile/README.zh.md">Read in Chinese</a>
 </p>
 
-<p align="center">
-  <code>requirements</code>
-  <code>design</code>
-  <code>development</code>
-  <code>testing</code>
-  <code>operations</code>
-  <code>human-ai</code>
-</p>
-
-> **Nexus** is not a point tool. It is the core hub that reconnects the entire software chain around AI, while forming a shared workflow for human creativity and AI capability.
+> **Nexus** is not a point tool. It is the operating hub where the chain reconnects and where human and AI workflows meet.
 
 ## What Nexus Means
 
-- **Full-chain core hub**  
-  The end-to-end R&D core connecting requirements, design, development, testing, and operations.
+- **Full-chain hub**  
+  A single operating center across requirements, design, development, testing, and operations.
 
-- **Human-AI symbiotic hub**  
-  A shared operating model for human creativity and AI capability, built for amplification rather than replacement.
+- **Human-AI co-creation**  
+  A workflow model where human judgment and AI execution amplify each other.
 
-- **Boundary-breaking node**  
-  A central node that reorganizes fragmented tools, roles, and workflows into one system.
+- **System-level design**  
+  A lab for reconnecting fragmented tools, roles, and loops into one end-to-end system.
 
-## Research Program
+## Focus Areas
 
 - **AI-native software engineering**  
-  Explore AI-native flows across requirements, design, implementation, testing, and operations.
+  New workflows for requirements, design, implementation, testing, and operations.
 
-- **End-to-end developer systems**  
-  Build connected developer systems instead of isolated point solutions.
+- **Connected developer systems**  
+  Infrastructure and products that optimize the whole chain rather than isolated steps.
 
 - **Human-AI workflow design**  
-  Study how human judgment, AI execution, and feedback loops operate together in real engineering environments.
+  Practical models for shared execution, review, feedback, and control.
 
-- **Open prototypes and lab artifacts**  
-  Publish prototypes, experiments, tools, and lab notes as open research artifacts.
-
-## System Motion
+## Signal Motion
 
 <p align="center">
-  <img alt="Monochrome animated system diagram showing requirements, design, build, test, and operations routing through the Nexus core hub into human-AI collaboration." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
+  <img alt="Minimal monochrome animation of signals moving through the Nexus hub from full-chain inputs to human and AI outputs." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
 </p>
 
 <p align="center">
-  <sub>A monochrome motion diagram of how the chain reconnects through the Nexus core hub.</sub>
+  <sub>Minimal signal flow through the Nexus hub.</sub>
 </p>
-
-## Chain View
-
-```text
-Requirements -> Design -> Development -> Testing -> Operations
-                    \           NEXUS           /
-                     \------ Human <-> AI -----/
-```
-
-## Operating Principles
-
-- Treat AI as the hub, not a plug-in
-- Optimize the whole chain, not isolated steps
-- Keep humans in the loop of judgment and creation
-- Validate ideas through real tools and working systems
 
 ## Entry Points
 
@@ -81,5 +54,3 @@ Requirements -> Design -> Development -> Testing -> Operations
 - [Repositories](https://github.com/orgs/nexus-research-lab/repositories)
 - [Chinese version](https://github.com/nexus-research-lab/.github/blob/main/profile/README.zh.md)
 - Pinned repositories below are the best starting points
-
-> Nexus is not a point. It is the hub where the chain reconnects.
