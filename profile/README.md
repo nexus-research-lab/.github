@@ -1,12 +1,6 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-banner-dark.gif">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-banner-light.gif">
-    <img alt="Animated Nexus Research Lab banner showing the full software-development chain converging into a Nexus core hub, with human and AI connecting on the other side." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-banner-light.gif" />
-  </picture>
+  <img alt="Monochrome Nexus Research Lab title card" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-monochrome.png" />
 </p>
-
-<h1 align="center">Nexus Research Lab</h1>
 
 <p align="center">
   <strong>Nexus: the AI-centered hub that reconnects the full software-development chain end to end</strong>
@@ -56,6 +50,16 @@
 - **Open prototypes and lab artifacts**  
   Publish prototypes, experiments, tools, and lab notes as open research artifacts.
 
+## System Motion
+
+<p align="center">
+  <img alt="Monochrome animated system diagram showing requirements, design, build, test, and operations routing through the Nexus core hub into human-AI collaboration." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
+</p>
+
+<p align="center">
+  <sub>A monochrome motion diagram of how the chain reconnects through the Nexus core hub.</sub>
+</p>
+
 ## Chain View
 
 ```text
@@ -75,6 +79,7 @@ Requirements -> Design -> Development -> Testing -> Operations
 
 - [Organization overview](https://github.com/nexus-research-lab)
 - [Repositories](https://github.com/orgs/nexus-research-lab/repositories)
+- [Chinese version](https://github.com/nexus-research-lab/.github/blob/main/profile/README.zh.md)
 - Pinned repositories below are the best starting points
 
 > Nexus is not a point. It is the hub where the chain reconnects.

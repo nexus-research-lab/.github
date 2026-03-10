@@ -1,279 +1,244 @@
-from dataclasses import dataclass
-from math import cos, pi, sin
+from math import cos, sin
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 
-WIDTH = 1280
-HEIGHT = 360
-FRAMES = 18
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
 FONT_DIR = Path("/Users/berhand/.agents/skills/canvas-design/canvas-fonts")
 
+HERO_OUT = ASSETS / "nexus-profile-hero-monochrome.png"
+HERO_PREVIEW = ASSETS / "nexus-profile-hero-monochrome-preview.png"
+MOTION_OUT = ASSETS / "nexus-system-motion-monochrome.gif"
+MOTION_PREVIEW = ASSETS / "nexus-system-motion-monochrome-preview.png"
 
-@dataclass(frozen=True)
-class Theme:
-    name: str
-    bg: str
-    glow_left: str
-    glow_right: str
-    glow_center: str
-    grid_minor: str
-    grid_major: str
-    ring: str
-    orbit_line: str
-    chain_base: str
-    chain_primary: str
-    hub_fill: str
-    hub_outline: str
-    text_primary: str
-    text_accent: str
-    text_secondary: str
-    strip_text: str
-    node_outer: str
-    node_inner: str
-    human: str
-    ai: str
-    bridge: str
-    pulse: str
-    scan: str
+WIDTH = 1440
+HERO_HEIGHT = 460
+MOTION_HEIGHT = 520
+FRAMES = 14
 
 
-THEMES = (
-    Theme(
-        name="dark",
-        bg="#07111d",
-        glow_left="#11325c",
-        glow_right="#16325a",
-        glow_center="#18dfff",
-        grid_minor="#6f84a6",
-        grid_major="#8aa3c2",
-        ring="#3a5371",
-        orbit_line="#304867",
-        chain_base="#4c6686",
-        chain_primary="#6ddcff",
-        hub_fill="#091321",
-        hub_outline="#dffbff",
-        text_primary="#eef8ff",
-        text_accent="#70e2ff",
-        text_secondary="#a3b8d4",
-        strip_text="#7d93af",
-        node_outer="#d8fbff",
-        node_inner="#25e7ff",
-        human="#7de0ff",
-        ai="#9aa7ff",
-        bridge="#dbf9ff",
-        pulse="#2af1ff",
-        scan="#d7ffff",
-    ),
-    Theme(
-        name="light",
-        bg="#f6f9fd",
-        glow_left="#d5e7ff",
-        glow_right="#d8f7ff",
-        glow_center="#8ae7ff",
-        grid_minor="#d4dceb",
-        grid_major="#bcc9dd",
-        ring="#9db0c9",
-        orbit_line="#c3d0e2",
-        chain_base="#8ea3bf",
-        chain_primary="#1a8ec0",
-        hub_fill="#ffffff",
-        hub_outline="#1b344b",
-        text_primary="#163149",
-        text_accent="#1094c7",
-        text_secondary="#4c6784",
-        strip_text="#687c97",
-        node_outer="#ffffff",
-        node_inner="#16a6dc",
-        human="#1599d3",
-        ai="#6f85ee",
-        bridge="#24425b",
-        pulse="#0ecbff",
-        scan="#ffffff",
-    ),
-)
+def rounded_mask(size, radius):
+    mask = Image.new("L", size, 0)
+    draw = ImageDraw.Draw(mask)
+    draw.rounded_rectangle((0, 0, size[0], size[1]), radius=radius, fill=255)
+    return mask
 
 
-def rgba(hex_color: str, alpha: int = 255):
-    hex_color = hex_color.lstrip("#")
-    return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4)) + (alpha,)
+def add_card(canvas, box, radius=34):
+    x0, y0, x1, y1 = box
+    width = x1 - x0
+    height = y1 - y0
+
+    shadow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    shadow_draw = ImageDraw.Draw(shadow)
+    shadow_draw.rounded_rectangle((0, 0, width, height), radius=radius, fill=(0, 0, 0, 24))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(18))
+    canvas.alpha_composite(shadow, (x0, y0 + 10))
+
+    card = Image.new("RGBA", (width, height), (255, 255, 255, 255))
+    border = ImageDraw.Draw(card)
+    border.rounded_rectangle((0, 0, width - 1, height - 1), radius=radius, outline=(22, 22, 22, 54), width=2)
+    canvas.alpha_composite(card, (x0, y0))
+
+
+def fit_text(draw, text, font_path, max_size, min_size, max_width):
+    for size in range(max_size, min_size - 1, -2):
+        font = ImageFont.truetype(str(font_path), size)
+        bbox = draw.textbbox((0, 0), text, font=font)
+        if bbox[2] - bbox[0] <= max_width:
+            return font
+    return ImageFont.truetype(str(font_path), min_size)
+
+
+def draw_brand_mark(size):
+    icon = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(icon)
+    c = size // 2
+    line = (8, 8, 8, 255)
+    soft = (8, 8, 8, 104)
+
+    for radius, width, color in ((112, 12, line), (84, 8, soft), (54, 6, soft)):
+        draw.ellipse((c - radius, c - radius, c + radius, c + radius), outline=color, width=width)
+
+    outer = []
+    ring = 112
+    for idx in range(6):
+        angle = -1.5708 + idx * 1.0472
+        outer.append((c + ring * cos(angle), c + ring * sin(angle)))
+
+    for point in outer:
+        draw.ellipse((point[0] - 12, point[1] - 12, point[0] + 12, point[1] + 12), fill=line)
+
+    for start, end in ((0, 2), (2, 4), (4, 0), (1, 3), (3, 5), (5, 1)):
+        draw.line((*outer[start], c, c), fill=soft, width=6)
+        draw.line((*outer[start], *outer[end]), fill=soft, width=5)
+
+    diamond = [
+        (c, c - 70),
+        (c + 70, c),
+        (c, c + 70),
+        (c - 70, c),
+    ]
+    draw.polygon(diamond, outline=line, fill=(255, 255, 255, 255), width=10)
+    draw.rounded_rectangle((c - 58, c - 58, c + 58, c + 58), radius=20, outline=line, width=8)
+    draw.line((c - 94, c, c + 94, c), fill=line, width=8)
+    draw.line((c, c - 94, c, c + 94), fill=line, width=8)
+
+    return icon
+
+
+def generate_hero_card():
+    canvas = Image.new("RGBA", (WIDTH, HERO_HEIGHT), (0, 0, 0, 0))
+    add_card(canvas, (28, 24, WIDTH - 28, HERO_HEIGHT - 24), radius=34)
+    draw = ImageDraw.Draw(canvas)
+
+    icon = draw_brand_mark(270)
+    canvas.alpha_composite(icon, (120, 94))
+
+    mono = FONT_DIR / "IBMPlexMono-Regular.ttf"
+    title_font = fit_text(draw, "NEXUS", FONT_DIR / "Outfit-Bold.ttf", 142, 92, 630)
+    sub_font = fit_text(draw, "RESEARCH LAB", FONT_DIR / "Outfit-Bold.ttf", 82, 48, 630)
+    meta_font = ImageFont.truetype(str(mono), 22)
+
+    draw.text((454, 112), "NEXUS", font=title_font, fill=(7, 7, 7, 255))
+    draw.text((460, 244), "RESEARCH LAB", font=sub_font, fill=(7, 7, 7, 255))
+    draw.text((462, 334), "AI-centered hub for full-chain software creation", font=meta_font, fill=(82, 82, 82, 255))
+    draw.text((1140, 72), "GITHUB ORGANIZATION PROFILE", font=meta_font, fill=(130, 130, 130, 255), anchor="ra")
+
+    canvas.save(HERO_OUT)
+    canvas.save(HERO_PREVIEW)
+
+
+def draw_grid(draw, card_box):
+    x0, y0, x1, y1 = card_box
+    for x in range(x0 + 36, x1 - 35, 36):
+        alpha = 18 if (x - x0) % 144 else 28
+        draw.line((x, y0 + 24, x, y1 - 24), fill=(0, 0, 0, alpha), width=1)
+    for y in range(y0 + 24, y1 - 23, 36):
+        alpha = 16 if (y - y0) % 108 else 24
+        draw.line((x0 + 24, y, x1 - 24, y), fill=(0, 0, 0, alpha), width=1)
+
+
+def node(draw, xy, label, fill=(17, 17, 17, 255), text_fill=(70, 70, 70, 255)):
+    x, y = xy
+    draw.ellipse((x - 12, y - 12, x + 12, y + 12), fill=fill)
+    draw.ellipse((x - 5, y - 5, x + 5, y + 5), fill=(255, 255, 255, 255))
+    font = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Regular.ttf"), 24)
+    draw.text((x - 28, y - 42), label, font=font, fill=text_fill)
 
 
 def lerp(a, b, t):
     return a + (b - a) * t
 
 
-def point_lerp(p0, p1, t):
-    return (lerp(p0[0], p1[0], t), lerp(p0[1], p1[1], t))
+def point_lerp(a, b, t):
+    return (lerp(a[0], b[0], t), lerp(a[1], b[1], t))
 
 
-def center_text(draw, xy, text, font, fill):
-    bbox = draw.textbbox((0, 0), text, font=font)
-    width = bbox[2] - bbox[0]
-    height = bbox[3] - bbox[1]
-    draw.text((xy[0] - width / 2, xy[1] - height / 2), text, font=font, fill=fill)
+def generate_motion_frames():
+    frames = []
+    mono = FONT_DIR / "IBMPlexMono-Regular.ttf"
+    title_font = ImageFont.truetype(str(FONT_DIR / "Outfit-Bold.ttf"), 52)
+    meta_font = ImageFont.truetype(str(mono), 22)
+    small_font = ImageFont.truetype(str(mono), 18)
 
-
-def add_glow(base: Image.Image, center, radius, color, blur):
-    layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(layer)
-    x, y = center
-    draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=color)
-    layer = layer.filter(ImageFilter.GaussianBlur(blur))
-    base.alpha_composite(layer)
-
-
-def draw_grid(draw: ImageDraw.ImageDraw, frame_index: int, theme: Theme):
-    x_offset = int((frame_index / FRAMES) * 18)
-    y_offset = int((frame_index / FRAMES) * 12)
-
-    for x in range(-x_offset, WIDTH + 32, 32):
-        alpha = 30 if x % 128 else 48
-        color = theme.grid_minor if x % 128 else theme.grid_major
-        draw.line((x, 0, x, HEIGHT), fill=rgba(color, alpha), width=1)
-
-    for y in range(-y_offset, HEIGHT + 32, 32):
-        alpha = 26 if y % 96 else 40
-        color = theme.grid_minor if y % 96 else theme.grid_major
-        draw.line((0, y, WIDTH, y), fill=rgba(color, alpha), width=1)
-
-
-def draw_node(image: Image.Image, draw: ImageDraw.ImageDraw, point, theme: Theme, size=12):
-    add_glow(image, point, size + 8, rgba(theme.node_inner, 78), 14)
-    draw.ellipse((point[0] - size, point[1] - size, point[0] + size, point[1] + size), fill=rgba(theme.node_outer, 238))
-    draw.ellipse((point[0] - 5, point[1] - 5, point[0] + 5, point[1] + 5), fill=rgba(theme.node_inner))
-
-
-def build_frame(frame_index: int, theme: Theme):
-    t = frame_index / FRAMES
-    image = Image.new("RGBA", (WIDTH, HEIGHT), rgba(theme.bg))
-    draw = ImageDraw.Draw(image)
-
-    add_glow(image, (190, 105), 220, rgba(theme.glow_left, 140), 90)
-    add_glow(image, (1020, 92), 170, rgba(theme.glow_right, 78), 76)
-    add_glow(image, (1015, 284), 170, rgba(theme.ai, 44), 72)
-    add_glow(image, (775, 180), 260, rgba(theme.glow_center, 24), 118)
-
-    draw_grid(draw, frame_index, theme)
-
-    hub = (790, 178)
-    human = (1086, 104)
-    ai = (1086, 256)
-    right_bridge = (948, 178)
+    card_box = (28, 24, WIDTH - 28, MOTION_HEIGHT - 24)
+    hub = (836, 274)
+    human = (1196, 184)
+    ai = (1196, 352)
+    bridge = (1002, 274)
     stages = [
-        ("REQ", (430, 82)),
-        ("DESIGN", (525, 126)),
-        ("BUILD", (555, 201)),
-        ("TEST", (505, 271)),
-        ("OPS", (420, 312)),
+        ("REQ", (500, 164)),
+        ("DESIGN", (596, 214)),
+        ("BUILD", (630, 284)),
+        ("TEST", (574, 360)),
+        ("OPS", (480, 416)),
     ]
-
-    pulse_scale = 1 + 0.016 * sin(2 * pi * t)
-    for radius, width in zip((92, 136, 192), (3, 2, 2)):
-        r = radius * pulse_scale
-        box = (hub[0] - r, hub[1] - r, hub[0] + r, hub[1] + r)
-        draw.ellipse(box, outline=rgba(theme.ring, 148), width=width)
-
-    chain_points = [pos for _, pos in stages] + [hub]
-    for idx in range(len(chain_points) - 1):
-        a = chain_points[idx]
-        b = chain_points[idx + 1]
-        draw.line((*a, *b), fill=rgba(theme.chain_base, 145), width=4)
-
-    for idx in range(len(stages) - 1):
-        a = stages[idx][1]
-        b = stages[idx + 1][1]
-        draw.line((*a, *b), fill=rgba(theme.chain_primary, 228), width=8)
-
-    draw.line((*hub, *right_bridge), fill=rgba(theme.bridge, 230), width=11)
-    draw.line((*right_bridge, *human), fill=rgba(theme.human, 216), width=6)
-    draw.line((*right_bridge, *ai), fill=rgba(theme.ai, 202), width=6)
-    draw.arc((938, 62, 1234, 304), start=225, end=315, fill=rgba(theme.ring, 135), width=2)
-    draw.arc((938, 62, 1234, 304), start=45, end=136, fill=rgba(theme.ring, 135), width=2)
-
-    orbit_radius = 226
-    orbit_points = []
-    for idx in range(7):
-        angle = (-0.14 + idx / 7) * 2 * pi
-        orbit_points.append((hub[0] + orbit_radius * cos(angle), hub[1] + orbit_radius * sin(angle)))
-    for point in orbit_points:
-        draw.ellipse((point[0] - 6, point[1] - 6, point[0] + 6, point[1] + 6), fill=rgba(theme.node_outer, 190))
-    for start_index, end_index in ((0, 3), (2, 5)):
-        draw.line((*orbit_points[start_index], *orbit_points[end_index]), fill=rgba(theme.orbit_line, 120), width=2)
-
-    animated_paths = [
+    paths = [
         (stages[0][1], stages[1][1]),
         (stages[1][1], stages[2][1]),
         (stages[2][1], stages[3][1]),
         (stages[3][1], stages[4][1]),
         (stages[4][1], hub),
-        (human, right_bridge),
-        (ai, right_bridge),
-        (right_bridge, hub),
+        (hub, bridge),
+        (bridge, human),
+        (bridge, ai),
     ]
-    for idx, (start, end) in enumerate(animated_paths):
-        pulse_t = (t * 1.38 + idx * 0.16) % 1
-        pulse_xy = point_lerp(start, end, pulse_t)
-        add_glow(image, pulse_xy, 15, rgba(theme.pulse, 150), 18)
-        draw.ellipse((pulse_xy[0] - 5, pulse_xy[1] - 5, pulse_xy[0] + 5, pulse_xy[1] + 5), fill=rgba("#ffffff", 255))
 
-    diamond = [
-        (hub[0], hub[1] - 84),
-        (hub[0] + 84, hub[1]),
-        (hub[0], hub[1] + 84),
-        (hub[0] - 84, hub[1]),
-    ]
-    draw.polygon(diamond, outline=rgba(theme.hub_outline, 230), fill=rgba(theme.hub_fill, 228), width=5)
-    draw.rounded_rectangle(
-        (hub[0] - 74, hub[1] - 74, hub[0] + 74, hub[1] + 74),
-        radius=28,
-        outline=rgba(theme.chain_primary, 240),
-        width=4,
-    )
+    for i in range(FRAMES):
+        t = i / FRAMES
+        canvas = Image.new("RGBA", (WIDTH, MOTION_HEIGHT), (0, 0, 0, 0))
+        add_card(canvas, card_box, radius=34)
+        draw = ImageDraw.Draw(canvas)
 
-    title_font = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Bold.ttf"), 54)
-    mono_font = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Regular.ttf"), 20)
-    mono_small = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Regular.ttf"), 16)
+        draw_grid(draw, card_box)
 
-    draw.text((84, 82), "NEXUS", font=title_font, fill=rgba(theme.text_primary, 250))
-    draw.text((84, 134), "RESEARCH LAB", font=title_font, fill=rgba(theme.text_accent, 232))
-    draw.text((84, 184), "the ai-centered hub for full-chain software creation", font=mono_font, fill=rgba(theme.text_secondary, 238))
-    draw.text((84, 296), "full-chain hub  |  human-ai co-creation", font=mono_small, fill=rgba(theme.strip_text, 220))
+        draw.text((88, 68), "SYSTEM MOTION", font=title_font, fill=(10, 10, 10, 255))
+        draw.text((88, 124), "full-chain orchestration routed through a Nexus core hub", font=meta_font, fill=(86, 86, 86, 255))
+        draw.text((88, 160), "requirements  ->  design  ->  build  ->  test  ->  operate  ->  human-ai", font=small_font, fill=(116, 116, 116, 255))
 
-    for label, (x, y) in stages:
-        draw_node(image, draw, (x, y), theme)
-        draw.text((x - 28, y - 33), label, font=mono_small, fill=rgba(theme.text_secondary, 236))
+        for radius, width in ((96, 2), (148, 2), (210, 1)):
+            draw.ellipse((hub[0] - radius, hub[1] - radius, hub[0] + radius, hub[1] + radius), outline=(40, 40, 40, 36), width=width)
 
-    for label, point, fill in (("HUMAN", human, theme.human), ("AI", ai, theme.ai)):
-        add_glow(image, point, 24, rgba(fill, 64), 16)
-        draw.ellipse((point[0] - 15, point[1] - 15, point[0] + 15, point[1] + 15), fill=rgba(theme.node_outer, 235))
-        draw.ellipse((point[0] - 6, point[1] - 6, point[0] + 6, point[1] + 6), fill=rgba(fill))
-        draw.text((point[0] - 30, point[1] - 39), label, font=mono_small, fill=rgba(theme.text_secondary, 235))
+        for start, end in paths:
+            draw.line((*start, *end), fill=(22, 22, 22, 185), width=6 if end == hub or start == hub else 5)
 
-    center_text(draw, (hub[0], hub[1] - 11), "NEXUS", mono_font, rgba(theme.text_primary, 255))
-    center_text(draw, (hub[0], hub[1] + 19), "CORE HUB", mono_small, rgba(theme.text_accent, 255))
+        diamond = [
+            (hub[0], hub[1] - 90),
+            (hub[0] + 90, hub[1]),
+            (hub[0], hub[1] + 90),
+            (hub[0] - 90, hub[1]),
+        ]
+        draw.polygon(diamond, outline=(0, 0, 0, 255), fill=(255, 255, 255, 255), width=5)
+        draw.rounded_rectangle((hub[0] - 78, hub[1] - 78, hub[0] + 78, hub[1] + 78), radius=30, outline=(0, 0, 0, 255), width=4)
+        draw.text((hub[0], hub[1] - 8), "NEXUS", font=meta_font, fill=(0, 0, 0, 255), anchor="mm")
+        draw.text((hub[0], hub[1] + 24), "CORE HUB", font=small_font, fill=(55, 55, 55, 255), anchor="mm")
 
-    scan_x = int(lerp(-180, WIDTH + 80, t))
-    scan = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    scan_draw = ImageDraw.Draw(scan)
-    scan_draw.rectangle((scan_x, 0, scan_x + 86, HEIGHT), fill=rgba(theme.scan, 18))
-    scan = scan.filter(ImageFilter.GaussianBlur(18))
-    image.alpha_composite(scan)
+        for label, xy in stages:
+            node(draw, xy, label)
 
-    return image
+        node(draw, human, "HUMAN")
+        node(draw, ai, "AI")
+
+        orbit_points = []
+        for j in range(7):
+            angle = (-0.13 + j / 7) * 6.28318
+            orbit_points.append((hub[0] + 228 * cos(angle), hub[1] + 228 * sin(angle)))
+        for point in orbit_points:
+            draw.ellipse((point[0] - 6, point[1] - 6, point[0] + 6, point[1] + 6), fill=(20, 20, 20, 70))
+        for a, b in ((0, 3), (2, 5)):
+            draw.line((*orbit_points[a], *orbit_points[b]), fill=(20, 20, 20, 60), width=2)
+
+        pulse_paths = [
+            (stages[0][1], stages[1][1]),
+            (stages[1][1], stages[2][1]),
+            (stages[2][1], stages[3][1]),
+            (stages[3][1], stages[4][1]),
+            (stages[4][1], hub),
+            (hub, bridge),
+            (bridge, human),
+            (bridge, ai),
+        ]
+        for idx, (start, end) in enumerate(pulse_paths):
+            pulse_t = (t * 1.35 + idx * 0.14) % 1
+            px, py = point_lerp(start, end, pulse_t)
+            draw.ellipse((px - 8, py - 8, px + 8, py + 8), fill=(5, 5, 5, 255))
+
+        frames.append(canvas)
+
+    return frames
 
 
-def save_gif(frames, path: Path):
-    paletted = [frame.convert("P", palette=Image.Palette.ADAPTIVE, colors=128) for frame in frames]
+def save_gif(frames):
+    paletted = [frame.convert("P", palette=Image.Palette.ADAPTIVE, colors=32) for frame in frames]
     paletted[0].save(
-        path,
+        MOTION_OUT,
         save_all=True,
         append_images=paletted[1:],
         optimize=True,
-        duration=90,
+        duration=110,
         loop=0,
         disposal=2,
     )
@@ -281,10 +246,10 @@ def save_gif(frames, path: Path):
 
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
-    for theme in THEMES:
-        frames = [build_frame(i, theme) for i in range(FRAMES)]
-        frames[0].save(ASSETS / f"nexus-profile-banner-{theme.name}-preview.png")
-        save_gif(frames, ASSETS / f"nexus-profile-banner-{theme.name}.gif")
+    generate_hero_card()
+    frames = generate_motion_frames()
+    frames[0].save(MOTION_PREVIEW)
+    save_gif(frames)
 
 
 if __name__ == "__main__":

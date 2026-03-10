@@ -1,12 +1,6 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-banner-dark.gif">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-banner-light.gif">
-    <img alt="Nexus Research Lab banner" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-banner-light.gif" />
-  </picture>
+  <img alt="Nexus Research Lab title card" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-monochrome.png" />
 </p>
-
-<h1 align="center">Nexus Research Lab</h1>
 
 <p align="center">
   <strong>道枢：以 AI 为核心枢纽，打通端到端软件开发全链路</strong>
@@ -55,6 +49,16 @@
 
 - **开放原型与实验产物**  
   通过公开仓库持续沉淀原型、实验、工具与研究记录。
+
+## 系统动态图
+
+<p align="center">
+  <img alt="黑白动态系统图，展示需求、设计、开发、测试、运维如何汇入 Nexus 核心枢纽，并连接到人机协同。" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
+</p>
+
+<p align="center">
+  <sub>黑白高对比动态图，表示软件研发全链路如何通过 Nexus 重新汇合。</sub>
+</p>
 
 ## 链路视图
 

@@ -1,0 +1,11 @@
+# Signal Ledger
+
+This visual language rejects ornamental futurism in favor of institutional clarity. The composition should feel like a research artifact from a laboratory that has already proven itself: monochrome, exact, weight-balanced, and meticulously crafted to the point that every line looks inevitable. Black is used not as decoration but as authority. White is not empty space but engineered silence. The work must appear painstakingly refined, as though it has passed through countless rounds of deliberate adjustment by someone operating at the top of their field.
+
+Form is the first language. Marks should be bold enough to survive reduction, but never clumsy. Rounded geometry, nested structures, and measured line intervals must create the impression of a system that is both rigorous and alive. The composition should be painstakingly controlled, with every curve and gap carrying structural meaning. The result should feel master-level and immaculately considered, not merely simplified.
+
+Scale and hierarchy should produce immediate legibility. One gesture acts as the institutional signature, while the surrounding typography and diagrammatic systems behave like disciplined annotation. The eye should know where to enter within a second. Large forms carry identity; smaller forms reveal logic. Every relationship in the layout should feel meticulously tuned, with proportion doing more work than explanation.
+
+Motion, when present, should be analytical rather than flashy. Animation should feel like signal propagation through a measured system: crisp pulses, stable nodes, clear directionality, no glow-heavy spectacle. The moving elements must look lab-grade, deeply deliberate, and technically exact, like a high-resolution diagnostic visualization designed by an expert with painstaking attention to craft.
+
+The overall impression should be a monochrome monograph of a living system: controlled, sparse, and quietly forceful. It must feel premium without looking luxurious, technical without becoming cold, and iconic without leaning on borrowed symbolism. Above all, it should read as the work of a serious institution whose visual decisions have been labored over with care and executed at a master level.
