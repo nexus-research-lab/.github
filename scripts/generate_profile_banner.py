@@ -105,8 +105,6 @@ def generate_hero_card():
     draw.text((454, 112), "NEXUS", font=title_font, fill=(7, 7, 7, 255))
     draw.text((460, 244), "RESEARCH LAB", font=sub_font, fill=(7, 7, 7, 255))
     draw.text((462, 334), "AI-centered hub for full-chain software creation", font=meta_font, fill=(82, 82, 82, 255))
-    draw.text((1140, 72), "GITHUB ORGANIZATION PROFILE", font=meta_font, fill=(130, 130, 130, 255), anchor="ra")
-
     canvas.save(HERO_OUT)
     canvas.save(HERO_PREVIEW)
 
