@@ -50,124 +50,136 @@ def draw_grid(draw: ImageDraw.ImageDraw, frame_index: int):
         draw.line((0, y, WIDTH, y), fill=rgba("#6f84a6", alpha), width=1)
 
 
+def center_text(draw, xy, text, font, fill):
+    bbox = draw.textbbox((0, 0), text, font=font)
+    width = bbox[2] - bbox[0]
+    height = bbox[3] - bbox[1]
+    draw.text((xy[0] - width / 2, xy[1] - height / 2), text, font=font, fill=fill)
+
+
 def build_frame(frame_index: int):
     t = frame_index / FRAMES
     image = Image.new("RGBA", (WIDTH, HEIGHT), rgba("#07111d"))
     draw = ImageDraw.Draw(image)
 
-    add_glow(image, (220, 100), 240, rgba("#0f2e57", 160), 96)
-    add_glow(image, (930, 250), 320, rgba("#16c7ff", 48), 110)
-    add_glow(image, (WIDTH // 2, HEIGHT // 2), 220, rgba("#18e2ff", 28), 120)
+    add_glow(image, (220, 110), 220, rgba("#0f2e57", 160), 96)
+    add_glow(image, (1060, 96), 180, rgba("#23dfff", 56), 82)
+    add_glow(image, (1010, 270), 180, rgba("#84a7ff", 42), 80)
+    add_glow(image, (WIDTH // 2, HEIGHT // 2), 260, rgba("#18e2ff", 30), 120)
 
     draw_grid(draw, frame_index)
 
-    cx = WIDTH * 0.57
-    cy = HEIGHT * 0.5
-    ring_radii = [68, 108, 154]
-    pulse_scale = 1 + 0.015 * sin(2 * pi * t)
+    hub = (760, 178)
+    hub_box = (hub[0] - 74, hub[1] - 74, hub[0] + 74, hub[1] + 74)
+    pulse_scale = 1 + 0.018 * sin(2 * pi * t)
 
-    for radius, width in zip(ring_radii, [3, 2, 2]):
+    for radius, width in zip((88, 132, 186), (3, 2, 2)):
         r = radius * pulse_scale
+        cx, cy = hub
         box = (cx - r, cy - r, cx + r, cy + r)
         draw.ellipse(box, outline=rgba("#36506d", 160), width=width)
 
-    nodes = {
-        "core_top": (cx, cy - 92),
-        "core_bottom": (cx, cy + 92),
-        "left_mid": (cx - 114, cy),
-        "right_mid": (cx + 114, cy),
-        "left_outer": (cx - 230, cy - 96),
-        "right_outer": (cx + 238, cy - 112),
-        "far_right": (cx + 344, cy + 12),
-        "far_left": (cx - 336, cy + 108),
-        "lower_left": (cx - 206, cy + 136),
-        "lower_right": (cx + 206, cy + 132),
-        "top_arc": (cx - 40, cy - 154),
-        "bottom_arc": (cx + 18, cy + 158),
-    }
-
-    edges = [
-        ("core_top", "left_mid"),
-        ("left_mid", "core_bottom"),
-        ("core_top", "core_bottom"),
-        ("core_top", "right_mid"),
-        ("right_mid", "core_bottom"),
-        ("left_outer", "lower_left"),
-        ("left_outer", "left_mid"),
-        ("far_left", "left_mid"),
-        ("far_left", "far_right"),
-        ("right_outer", "lower_right"),
-        ("right_outer", "right_mid"),
-        ("far_right", "lower_right"),
+    stages = [
+        ("REQ", (430, 80)),
+        ("DESIGN", (525, 130)),
+        ("BUILD", (555, 225)),
+        ("TEST", (505, 295)),
+        ("OPS", (420, 335)),
     ]
+    chain_points = [pos for _, pos in stages] + [hub]
+    for idx in range(len(chain_points) - 1):
+        a = chain_points[idx]
+        b = chain_points[idx + 1]
+        draw.line((*a, *b), fill=rgba("#4c6686", 168), width=4)
+    for idx in range(len(stages) - 1):
+        a = stages[idx][1]
+        b = stages[idx + 1][1]
+        draw.line((*a, *b), fill=rgba("#6ddcff", 210), width=8)
 
-    for start_key, end_key in edges:
-        start = nodes[start_key]
-        end = nodes[end_key]
-        draw.line((*start, *end), fill=rgba("#4b6889", 138), width=3)
+    human = (1060, 106)
+    ai = (1060, 256)
+    right_bridge = (934, 178)
+    draw.line((*hub, *right_bridge), fill=rgba("#dbf9ff", 228), width=12)
+    draw.line((*right_bridge, *human), fill=rgba("#6ddcff", 210), width=6)
+    draw.line((*right_bridge, *ai), fill=rgba("#89a6ff", 195), width=6)
+    draw.arc((915, 66, 1205, 306), start=224, end=315, fill=rgba("#3a5676", 148), width=2)
+    draw.arc((915, 66, 1205, 306), start=45, end=136, fill=rgba("#3a5676", 148), width=2)
 
-    draw.line((*nodes["core_top"], *nodes["left_mid"]), fill=rgba("#6ddcff", 255), width=10)
-    draw.line((*nodes["left_mid"], *nodes["core_bottom"]), fill=rgba("#6ddcff", 255), width=10)
-    draw.line((*nodes["core_top"], *nodes["core_bottom"]), fill=rgba("#d1f8ff", 230), width=14)
+    orbit_radius = 224
+    orbit_points = []
+    for idx in range(7):
+        angle = (-0.14 + idx / 7) * 2 * pi
+        orbit_points.append((hub[0] + orbit_radius * cos(angle), hub[1] + orbit_radius * sin(angle)))
+    for point in orbit_points:
+        draw.ellipse((point[0] - 6, point[1] - 6, point[0] + 6, point[1] + 6), fill=rgba("#dff8ff", 215))
+    for start_index, end_index in ((0, 3), (2, 5)):
+        draw.line((*orbit_points[start_index], *orbit_points[end_index]), fill=rgba("#314967", 118), width=2)
 
-    outer_ring = []
-    orbit_radius = 270
-    for idx in range(8):
-        angle = (-0.13 + idx / 8) * 2 * pi
-        outer_ring.append((cx + orbit_radius * cos(angle), cy + orbit_radius * sin(angle)))
-
-    for point in outer_ring:
-        draw.ellipse((point[0] - 7, point[1] - 7, point[0] + 7, point[1] + 7), fill=rgba("#dff8ff", 220))
-
-    for start_index, end_index in ((0, 3), (2, 5), (4, 7)):
-        draw.line((*outer_ring[start_index], *outer_ring[end_index]), fill=rgba("#314967", 130), width=2)
-
-    for idx, (start_key, end_key) in enumerate(edges[:8]):
-        pulse_t = (t * 1.6 + idx * 0.11) % 1
-        pulse_xy = point_lerp(nodes[start_key], nodes[end_key], pulse_t)
-        add_glow(image, pulse_xy, 14, rgba("#2af1ff", 160), 18)
+    animated_paths = [
+        (stages[0][1], stages[1][1]),
+        (stages[1][1], stages[2][1]),
+        (stages[2][1], stages[3][1]),
+        (stages[3][1], stages[4][1]),
+        (stages[4][1], hub),
+        (human, right_bridge),
+        (ai, right_bridge),
+        (right_bridge, hub),
+    ]
+    for idx, (start, end) in enumerate(animated_paths):
+        pulse_t = (t * 1.45 + idx * 0.14) % 1
+        pulse_xy = point_lerp(start, end, pulse_t)
+        add_glow(image, pulse_xy, 15, rgba("#2af1ff", 165), 18)
         draw.ellipse((pulse_xy[0] - 5, pulse_xy[1] - 5, pulse_xy[0] + 5, pulse_xy[1] + 5), fill=rgba("#ffffff", 255))
 
-    for x, y in nodes.values():
-        add_glow(image, (x, y), 16, rgba("#21e5ff", 90), 14)
-        draw.ellipse((x - 10, y - 10, x + 10, y + 10), fill=rgba("#d6fbff", 242))
-        draw.ellipse((x - 4, y - 4, x + 4, y + 4), fill=rgba("#23e7ff", 255))
-
-    draw.rounded_rectangle(
-        (cx - 84, cy - 84, cx + 84, cy + 84),
-        radius=28,
-        outline=rgba("#dffbff", 235),
-        width=5,
-    )
-    draw.rounded_rectangle(
-        (cx - 52, cy - 52, cx + 52, cy + 52),
-        radius=20,
-        fill=rgba("#07111d", 220),
-        outline=rgba("#3be6ff", 255),
-        width=4,
-    )
+    hub_shape = [
+        (hub[0], hub[1] - 84),
+        (hub[0] + 84, hub[1]),
+        (hub[0], hub[1] + 84),
+        (hub[0] - 84, hub[1]),
+    ]
+    draw.polygon(hub_shape, outline=rgba("#dffbff", 230), fill=rgba("#08121e", 220), width=5)
+    draw.rounded_rectangle(hub_box, radius=28, outline=rgba("#6de5ff", 255), width=4)
 
     title_font = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Bold.ttf"), 54)
     mono_font = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Regular.ttf"), 20)
-    serif_font = ImageFont.truetype(str(CN_FONT), 28)
+    mono_small = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Regular.ttf"), 16)
+    cn_font = ImageFont.truetype(str(CN_FONT), 28)
 
     draw.text((84, 84), "NEXUS", font=title_font, fill=rgba("#eef8ff", 250))
     draw.text((84, 136), "RESEARCH LAB", font=title_font, fill=rgba("#6adfff", 230))
     draw.text(
         (84, 186),
-        "connecting research, systems, and intelligence",
+        "the full-chain core hub for software creation",
         font=mono_font,
         fill=rgba("#9fb6d1", 240),
     )
     draw.text(
         (84, 224),
-        "连接研究、系统与智能",
-        font=serif_font,
+        "道枢：以 AI 为核心枢纽，打通软件研发全链路",
+        font=cn_font,
         fill=rgba("#dce9ff", 232),
     )
+    draw.text(
+        (84, 298),
+        "full-chain hub  |  human <-> ai symbiosis",
+        font=mono_small,
+        fill=rgba("#6f84a6", 214),
+    )
 
-    for idx, label in enumerate(("AGENTS", "SYSTEMS", "MEMORY", "INTERFACES")):
-        draw.text((84 + idx * 128, 292), label, font=mono_font, fill=rgba("#6f84a6", 214))
+    for label, (x, y) in stages:
+        add_glow(image, (x, y), 18, rgba("#20deff", 82), 16)
+        draw.ellipse((x - 12, y - 12, x + 12, y + 12), fill=rgba("#d8fbff", 240))
+        draw.ellipse((x - 5, y - 5, x + 5, y + 5), fill=rgba("#25e6ff", 255))
+        draw.text((x - 28, y - 33), label, font=mono_small, fill=rgba("#b5c7dd", 230))
+
+    for label, point, fill in (("HUMAN", human, rgba("#7de0ff", 255)), ("AI", ai, rgba("#93a9ff", 255))):
+        add_glow(image, point, 22, fill[:-1] + (88,), 16)
+        draw.ellipse((point[0] - 15, point[1] - 15, point[0] + 15, point[1] + 15), fill=rgba("#dff8ff", 238))
+        draw.ellipse((point[0] - 6, point[1] - 6, point[0] + 6, point[1] + 6), fill=fill)
+        draw.text((point[0] - 28, point[1] - 38), label, font=mono_small, fill=rgba("#dce7ff", 236))
+
+    center_text(draw, (hub[0], hub[1] - 10), "NEXUS", mono_font, rgba("#eef8ff", 255))
+    center_text(draw, (hub[0], hub[1] + 18), "CORE HUB", mono_small, rgba("#6adfff", 255))
 
     scan_x = int(lerp(-180, WIDTH + 80, t))
     scan = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
