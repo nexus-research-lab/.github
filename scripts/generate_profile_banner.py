@@ -1,4 +1,4 @@
-from math import pi, sin
+from math import cos, pi, sin
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -123,68 +123,69 @@ def generate_hero_card():
     canvas.save(HERO_OUT)
 
 
-def draw_stage(draw, x, y, label, label_y, pulse=0.0):
-    radius = 12
+def bezier_point(p0, p1, p2, p3, t):
+    inv = 1 - t
+    x = (inv ** 3) * p0[0] + 3 * (inv ** 2) * t * p1[0] + 3 * inv * (t ** 2) * p2[0] + (t ** 3) * p3[0]
+    y = (inv ** 3) * p0[1] + 3 * (inv ** 2) * t * p1[1] + 3 * inv * (t ** 2) * p2[1] + (t ** 3) * p3[1]
+    return (x, y)
+
+
+def draw_bezier(draw, p0, p1, p2, p3, fill, width, steps=56):
+    points = [bezier_point(p0, p1, p2, p3, idx / steps) for idx in range(steps + 1)]
+    for idx in range(len(points) - 1):
+        ax, ay = points[idx]
+        bx, by = points[idx + 1]
+        draw.line((ax, ay, bx, by), fill=fill, width=width)
+
+
+def draw_chain_node(draw, center, label, pulse=0.0):
+    x, y = center
+    radius = 13
     if pulse > 0:
-        glow_radius = radius + 4
+        glow = radius + 6
         draw.ellipse(
-            (x - glow_radius, y - glow_radius, x + glow_radius, y + glow_radius),
-            outline=(24, 24, 24, int(38 + pulse * 60)),
+            (x - glow, y - glow, x + glow, y + glow),
+            outline=(24, 24, 24, int(28 + pulse * 56)),
             width=2,
         )
     draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=(245, 245, 243, 255))
-    draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=(18, 18, 18, 235), width=4)
-    draw.text((x, label_y), label, font=font("IBMPlexMono-Regular.ttf", 18), fill=(92, 92, 92, 255), anchor="mm")
+    draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=(18, 18, 18, 215), width=3)
+    draw.ellipse((x - 4, y - 4, x + 4, y + 4), fill=(18, 18, 18, 255))
+    draw.text((x - 36, y), label, font=font("IBMPlexMono-Regular.ttf", 17), fill=(92, 92, 92, 255), anchor="rm")
 
 
-def draw_endpoint(draw, x, y, label, label_y):
-    draw.ellipse((x - 15, y - 15, x + 15, y + 15), fill=(245, 245, 243, 255))
-    draw.ellipse((x - 15, y - 15, x + 15, y + 15), outline=(18, 18, 18, 220), width=3)
-    draw.ellipse((x - 9, y - 9, x + 9, y + 9), outline=(18, 18, 18, 180), width=2)
+def draw_terminal(draw, center, label):
+    x, y = center
+    draw.ellipse((x - 16, y - 16, x + 16, y + 16), fill=(245, 245, 243, 255))
+    draw.ellipse((x - 16, y - 16, x + 16, y + 16), outline=(18, 18, 18, 220), width=3)
+    draw.ellipse((x - 9, y - 9, x + 9, y + 9), outline=(18, 18, 18, 168), width=2)
+    label_y = y - 34 if label == "HUMAN" else y + 38
     draw.text((x, label_y), label, font=font("IBMPlexMono-Regular.ttf", 18), fill=(92, 92, 92, 255), anchor="mm")
 
 
 def draw_hub(draw, center, phase):
     x, y = center
-    outer = 66 + int(round(3 * sin(phase * 2 * pi)))
-    mid = 52
     outline = (16, 16, 16, 255)
-    soft = (24, 24, 24, 24)
+    soft = (24, 24, 24, 26)
     card_fill = (245, 245, 243, 255)
+    orbit = 92
+    shell = 64
+    inner = 42
 
-    draw.ellipse((x - outer - 18, y - outer - 18, x + outer + 18, y + outer + 18), outline=soft, width=2)
-    draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=outline, width=4)
-    draw.rounded_rectangle((x - mid, y - mid, x + mid, y + mid), radius=20, outline=outline, width=4)
-    draw_diamond(draw, center, 58, outline, 4)
-    draw.rounded_rectangle((x - 54, y - 34, x + 54, y + 40), radius=18, fill=card_fill)
-    draw.text((x, y - 12), "CORE", font=font("Outfit-Bold.ttf", 28), fill=outline, anchor="mm")
-    draw.text((x, y + 22), "HUB", font=font("IBMPlexMono-Regular.ttf", 18), fill=(82, 82, 82, 255), anchor="mm")
+    draw.ellipse((x - orbit, y - orbit, x + orbit, y + orbit), outline=soft, width=2)
+    draw.ellipse((x - orbit + 12, y - orbit + 12, x + orbit - 12, y + orbit - 12), outline=(24, 24, 24, 18), width=1)
+    draw.ellipse((x - shell, y - shell, x + shell, y + shell), outline=outline, width=3)
+    draw.rounded_rectangle((x - inner, y - inner, x + inner, y + inner), radius=18, outline=outline, width=3)
+    draw_diamond(draw, center, 50, outline, 3)
 
+    for angle_offset in (0.0, 0.33, 0.66):
+        angle = (phase + angle_offset) * 2 * pi
+        px = x + (orbit - 6) * sin(angle)
+        py = y - (orbit - 6) * cos(angle)
+        draw.ellipse((px - 3, py - 3, px + 3, py + 3), fill=(18, 18, 18, 88))
 
-def polyline_lengths(points):
-    lengths = [0.0]
-    total = 0.0
-    for idx in range(len(points) - 1):
-        ax, ay = points[idx]
-        bx, by = points[idx + 1]
-        total += ((bx - ax) ** 2 + (by - ay) ** 2) ** 0.5
-        lengths.append(total)
-    return lengths, total
-
-
-def point_on_polyline(points, progress):
-    lengths, total = polyline_lengths(points)
-    target = total * progress
-    for idx in range(len(points) - 1):
-        start_len = lengths[idx]
-        end_len = lengths[idx + 1]
-        if target <= end_len:
-            span = end_len - start_len or 1
-            local = (target - start_len) / span
-            ax, ay = points[idx]
-            bx, by = points[idx + 1]
-            return (ax + (bx - ax) * local, ay + (by - ay) * local)
-    return points[-1]
+    draw.ellipse((x - 20, y - 20, x + 20, y + 20), fill=card_fill)
+    draw.ellipse((x - 20, y - 20, x + 20, y + 20), outline=(18, 18, 18, 112), width=1)
 
 
 def draw_pulse(draw, point, radius, alpha):
@@ -217,19 +218,34 @@ def generate_avatar():
 def generate_motion_frames():
     frames = []
     card_box = (28, 16, WIDTH - 28, MOTION_HEIGHT - 16)
-    stage_y = 212
-    label_y = 316
-    stage_x = [150, 272, 394, 516, 638]
-    hub = (806, 212)
-    split = (936, 212)
-    human = (1168, 154)
-    ai = (1168, 270)
+    hub = (770, 210)
+    human = (1168, 152)
+    ai = (1168, 268)
+    labels = ["REQUIRE", "DESIGN", "BUILD", "TEST", "OPERATE"]
+    stage_nodes = [
+        (206, 118),
+        (226, 164),
+        (238, 210),
+        (226, 256),
+        (206, 302),
+    ]
+    hub_entries = [
+        (hub[0] - 84, hub[1] - 54),
+        (hub[0] - 84, hub[1] - 26),
+        (hub[0] - 84, hub[1]),
+        (hub[0] - 84, hub[1] + 26),
+        (hub[0] - 84, hub[1] + 54),
+    ]
+    stage_paths = []
+    for start, end in zip(stage_nodes, hub_entries):
+        control_1 = (start[0] + 156, start[1])
+        control_2 = (hub[0] - 210, (start[1] + end[1]) / 2)
+        stage_paths.append((start, control_1, control_2, end))
 
-    incoming_points = [(stage_x[0], stage_y), (stage_x[4], stage_y), (hub[0] - 82, stage_y)]
-    human_points = [(hub[0] + 82, stage_y), split, human]
-    ai_points = [(hub[0] + 82, stage_y), split, ai]
-
-    labels = ["REQ", "DESIGN", "BUILD", "TEST", "OPS"]
+    human_forward = ((hub[0] + 72, hub[1] - 18), (908, 164), (1036, 134), (human[0] - 18, human[1]))
+    human_return = ((human[0] - 18, human[1] + 12), (1044, 176), (914, 198), (hub[0] + 62, hub[1] - 4))
+    ai_forward = ((hub[0] + 72, hub[1] + 18), (908, 256), (1036, 286), (ai[0] - 18, ai[1]))
+    ai_return = ((ai[0] - 18, ai[1] - 12), (1044, 244), (914, 222), (hub[0] + 62, hub[1] + 4))
 
     for frame_index in range(FRAMES):
         phase = frame_index / FRAMES
@@ -237,31 +253,43 @@ def generate_motion_frames():
         add_card(canvas, card_box, radius=34)
         draw = ImageDraw.Draw(canvas)
 
-        draw.line((96, stage_y, hub[0] - 82, stage_y), fill=(30, 30, 30, 150), width=3)
-        draw.line((hub[0] + 82, stage_y, split[0], split[1]), fill=(30, 30, 30, 132), width=2)
-        draw.line((split[0], split[1], human[0], human[1]), fill=(30, 30, 30, 132), width=2)
-        draw.line((split[0], split[1], ai[0], ai[1]), fill=(30, 30, 30, 132), width=2)
+        draw.text(
+            (96, 72),
+            "FULL-CHAIN CONVERGENCE / HUMAN <-> AI CO-CREATION",
+            font=font("IBMPlexMono-Regular.ttf", 18),
+            fill=(96, 96, 96, 255),
+        )
+        draw.line((96, 98, 1344, 98), fill=(10, 10, 10, 16), width=1)
 
-        draw.line((96, 108, 1344, 108), fill=(10, 10, 10, 18), width=1)
-        draw.text((96, 78), "SIGNAL FLOW THROUGH THE NEXUS HUB", font=font("IBMPlexMono-Regular.ttf", 18), fill=(96, 96, 96, 255))
+        for path in stage_paths:
+            draw_bezier(draw, *path, fill=(24, 24, 24, 132), width=2)
 
-        for idx, x in enumerate(stage_x):
-            pulse_strength = max(0.0, sin((phase * 2 * pi) - idx * 0.65)) * 0.55
-            draw_stage(draw, x, stage_y, labels[idx], label_y, pulse_strength)
+        draw_bezier(draw, *human_forward, fill=(24, 24, 24, 144), width=2)
+        draw_bezier(draw, *ai_forward, fill=(24, 24, 24, 144), width=2)
+        draw_bezier(draw, *human_return, fill=(24, 24, 24, 68), width=1)
+        draw_bezier(draw, *ai_return, fill=(24, 24, 24, 68), width=1)
 
-        draw_endpoint(draw, human[0], human[1], "HUMAN", 120)
-        draw_endpoint(draw, ai[0], ai[1], "AI", 318)
+        for idx, center in enumerate(stage_nodes):
+            pulse_strength = max(0.0, sin((phase * 2 * pi) - idx * 0.62)) * 0.48
+            draw_chain_node(draw, center, labels[idx], pulse_strength)
+
+        draw_terminal(draw, human, "HUMAN")
+        draw_terminal(draw, ai, "AI")
         draw_hub(draw, hub, phase)
 
-        for offset in (0.08, 0.36, 0.64):
-            progress = (phase + offset) % 1.0
-            pulse = point_on_polyline(incoming_points, progress)
-            draw_pulse(draw, pulse, 6, 190)
+        for idx, path in enumerate(stage_paths):
+            progress = (phase + idx * 0.16) % 1.0
+            pulse = bezier_point(*path, progress)
+            draw_pulse(draw, pulse, 5, 196)
 
-        for path, offset in ((human_points, 0.08), (ai_points, 0.56)):
-            progress = (phase + offset) % 1.0
-            pulse = point_on_polyline(path, progress)
-            draw_pulse(draw, pulse, 6, 185)
+        for path, offset, alpha in (
+            (human_forward, 0.12, 188),
+            (ai_forward, 0.54, 188),
+            (human_return, 0.46, 110),
+            (ai_return, 0.86, 110),
+        ):
+            pulse = bezier_point(*path, (phase + offset) % 1.0)
+            draw_pulse(draw, pulse, 5, alpha)
 
         frames.append(canvas)
 

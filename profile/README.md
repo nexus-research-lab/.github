@@ -41,11 +41,11 @@
 ## Signal Motion
 
 <p align="center">
-  <img alt="Minimal monochrome animation of signals moving through the Nexus hub from full-chain inputs to human and AI outputs." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
+  <img alt="Monochrome motion diagram showing five engineering stages converging into the Nexus hub and flowing bidirectionally between human and AI collaboration." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
 </p>
 
 <p align="center">
-  <sub>Minimal signal flow through the Nexus hub.</sub>
+  <sub>Five engineering stages converge into the Nexus hub, where human and AI workflows connect and return.</sub>
 </p>
 
 ## Entry Points

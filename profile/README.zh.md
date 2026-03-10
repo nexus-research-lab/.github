@@ -41,11 +41,11 @@
 ## 信号流动
 
 <p align="center">
-  <img alt="极简黑白动态图，展示全链路信号如何穿过 Nexus 中枢并流向人机协作出口。" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
+  <img alt="黑白动态图，展示五段软件研发链路如何汇入 Nexus 中枢，并在 Human 与 AI 之间形成双向协作流。" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
 </p>
 
 <p align="center">
-  <sub>极简黑白信号流，表示软件研发链路如何通过 Nexus 重新汇合。</sub>
+  <sub>五段研发链路汇入 Nexus 中枢，在 Human 与 AI 的协作中继续流动与回返。</sub>
 </p>
 
 ## 开始阅读
