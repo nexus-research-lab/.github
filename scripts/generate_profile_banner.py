@@ -143,13 +143,15 @@ def draw_hub(draw, center, phase):
     mid = 52
     outline = (16, 16, 16, 255)
     soft = (24, 24, 24, 24)
+    card_fill = (245, 245, 243, 255)
 
     draw.ellipse((x - outer - 18, y - outer - 18, x + outer + 18, y + outer + 18), outline=soft, width=2)
     draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=outline, width=4)
     draw.rounded_rectangle((x - mid, y - mid, x + mid, y + mid), radius=20, outline=outline, width=4)
     draw_diamond(draw, center, 58, outline, 4)
-    draw.text((x, y - 10), "NEXUS", font=font("Outfit-Bold.ttf", 30), fill=outline, anchor="mm")
-    draw.text((x, y + 22), "HUB", font=font("IBMPlexMono-Regular.ttf", 20), fill=(82, 82, 82, 255), anchor="mm")
+    draw.rounded_rectangle((x - 52, y - 34, x + 52, y + 40), radius=18, fill=card_fill)
+    draw.text((x, y - 12), "NEXUS", font=font("Outfit-Bold.ttf", 28), fill=outline, anchor="mm")
+    draw.text((x, y + 22), "HUB", font=font("IBMPlexMono-Regular.ttf", 18), fill=(82, 82, 82, 255), anchor="mm")
 
 
 def polyline_lengths(points):
