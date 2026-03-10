@@ -1,5 +1,9 @@
 <p align="center">
-  <img alt="Monochrome Nexus Research Lab title card" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-monochrome.png" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-light.png" />
+    <img alt="Theme-aware Nexus Research Lab title card" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-light.png" />
+  </picture>
 </p>
 
 <p align="center">

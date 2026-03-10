@@ -9,6 +9,8 @@ ASSETS = ROOT / "assets"
 FONT_DIR = Path("/Users/berhand/.agents/skills/canvas-design/canvas-fonts")
 
 HERO_OUT = ASSETS / "nexus-profile-hero-monochrome.png"
+HERO_LIGHT_OUT = ASSETS / "nexus-profile-hero-light.png"
+HERO_DARK_OUT = ASSETS / "nexus-profile-hero-dark.png"
 MOTION_OUT = ASSETS / "nexus-system-motion-monochrome.gif"
 MOTION_LIGHT_OUT = ASSETS / "nexus-system-motion-light.gif"
 MOTION_DARK_OUT = ASSETS / "nexus-system-motion-dark.gif"
@@ -97,7 +99,7 @@ def draw_diamond(draw, center, radius, outline, width):
     draw.line(points + [points[0]], fill=outline, width=width, joint="curve")
 
 
-def draw_nexus_mark(draw, center, radius):
+def draw_nexus_mark(draw, center, radius, primary=(14, 14, 14, 255), soft=(90, 90, 90, 165), inner_soft=(150, 150, 150, 108)):
     x, y = center
     outer = radius
     inner = int(radius * 0.66)
@@ -106,54 +108,65 @@ def draw_nexus_mark(draw, center, radius):
     inner_width = max(2, int(radius * 0.025))
     frame_width = max(4, int(radius * 0.075))
     node_radius = max(8, int(radius * 0.09))
-    soft = (90, 90, 90, 165)
-    black = (14, 14, 14, 255)
 
     draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=soft, width=outer_width)
-    draw.ellipse((x - outer + 18, y - outer + 18, x + outer - 18, y + outer - 18), outline=(150, 150, 150, 108), width=inner_width)
+    draw.ellipse((x - outer + 18, y - outer + 18, x + outer - 18, y + outer - 18), outline=inner_soft, width=inner_width)
     draw.rounded_rectangle(
         (x - inner, y - inner, x + inner, y + inner),
         radius=int(inner * 0.34),
-        outline=black,
+        outline=primary,
         width=frame_width,
     )
-    draw_diamond(draw, center, diamond, black, frame_width)
-    draw.line((x - outer, y, x + outer, y), fill=black, width=frame_width)
-    draw.line((x, y - outer, x, y + outer), fill=black, width=frame_width)
+    draw_diamond(draw, center, diamond, primary, frame_width)
+    draw.line((x - outer, y, x + outer, y), fill=primary, width=frame_width)
+    draw.line((x, y - outer, x, y + outer), fill=primary, width=frame_width)
 
     for dx, dy in ((0, -outer), (outer, 0), (0, outer), (-outer, 0)):
-        draw.ellipse((x + dx - node_radius, y + dy - node_radius, x + dx + node_radius, y + dy + node_radius), fill=black)
+        draw.ellipse((x + dx - node_radius, y + dy - node_radius, x + dx + node_radius, y + dy + node_radius), fill=primary)
 
 
-def generate_hero_card():
-    canvas = make_canvas((WIDTH, HERO_HEIGHT))
-    add_card(canvas, (28, 24, WIDTH - 28, HERO_HEIGHT - 24), radius=34)
+def generate_hero_card(theme_name):
+    is_dark = theme_name == "dark"
+    canvas_bg = (246, 248, 250, 255) if not is_dark else (13, 17, 23, 255)
+    card_bg = (245, 245, 243, 255) if not is_dark else (17, 21, 28, 255)
+    border = (26, 26, 26, 44) if not is_dark else (236, 236, 236, 36)
+    primary = (10, 10, 10, 255) if not is_dark else (238, 240, 243, 255)
+    secondary = (66, 66, 66, 255) if not is_dark else (176, 182, 190, 255)
+    tertiary = (96, 96, 96, 255) if not is_dark else (138, 145, 154, 255)
+    mark_soft = (90, 90, 90, 165) if not is_dark else (104, 114, 126, 180)
+    mark_inner = (150, 150, 150, 108) if not is_dark else (88, 96, 108, 138)
+
+    canvas = make_canvas((WIDTH, HERO_HEIGHT), canvas_bg)
+    add_card(canvas, (28, 24, WIDTH - 28, HERO_HEIGHT - 24), radius=34, bg=card_bg, border=border)
     draw = ImageDraw.Draw(canvas)
 
-    draw_nexus_mark(draw, (252, 230), 108)
+    draw_nexus_mark(draw, (252, 230), 108, primary=primary, soft=mark_soft, inner_soft=mark_inner)
 
     title_font = fit_text(draw, "NEXUS", "Outfit-Bold.ttf", 126, 96, 560)
     lab_font = fit_text(draw, "RESEARCH LAB", "Outfit-Bold.ttf", 86, 68, 740)
     meta_font = font("IBMPlexMono-Regular.ttf", 28)
     kicker_font = font("IBMPlexMono-Regular.ttf", 21)
 
-    draw.line((468, 116, 1302, 116), fill=(10, 10, 10, 38), width=2)
-    draw.text((468, 134), "NEXUS", font=title_font, fill=(10, 10, 10, 255))
-    draw.text((468, 256), "RESEARCH LAB", font=lab_font, fill=(10, 10, 10, 255))
+    draw.line((468, 116, 1302, 116), fill=(primary[0], primary[1], primary[2], 38 if not is_dark else 48), width=2)
+    draw.text((468, 134), "NEXUS", font=title_font, fill=primary)
+    draw.text((468, 256), "RESEARCH LAB", font=lab_font, fill=primary)
     draw.text(
         (472, 356),
         "AI-centered hub for end-to-end software creation",
         font=meta_font,
-        fill=(66, 66, 66, 255),
+        fill=secondary,
     )
     draw.text(
         (470, 80),
         "FULL-CHAIN SYSTEMS / HUMAN <-> AI",
         font=kicker_font,
-        fill=(96, 96, 96, 255),
+        fill=tertiary,
     )
 
-    canvas.save(HERO_OUT)
+    output = HERO_DARK_OUT if is_dark else HERO_LIGHT_OUT
+    canvas.save(output)
+    if not is_dark:
+        canvas.save(HERO_OUT)
 
 
 def bezier_point(p0, p1, p2, p3, t):
@@ -230,19 +243,26 @@ def draw_pulse(draw, point, radius, alpha):
 
 
 def generate_avatar():
-    canvas = Image.new("RGBA", (AVATAR_SIZE, AVATAR_SIZE), (244, 244, 242, 255))
+    canvas = Image.new("RGBA", (AVATAR_SIZE, AVATAR_SIZE), (24, 30, 40, 255))
     draw = ImageDraw.Draw(canvas)
     center = AVATAR_SIZE // 2
 
-    halo = Image.new("RGBA", (AVATAR_SIZE, AVATAR_SIZE), (0, 0, 0, 0))
-    halo_draw = ImageDraw.Draw(halo)
-    halo_draw.ellipse((116, 116, AVATAR_SIZE - 116, AVATAR_SIZE - 116), fill=(0, 0, 0, 10))
-    halo = halo.filter(ImageFilter.GaussianBlur(24))
-    canvas.alpha_composite(halo)
+    card = Image.new("RGBA", (AVATAR_SIZE, AVATAR_SIZE), (0, 0, 0, 0))
+    card_draw = ImageDraw.Draw(card)
+    card_draw.rounded_rectangle((48, 48, AVATAR_SIZE - 48, AVATAR_SIZE - 48), radius=180, fill=(18, 24, 33, 255))
+    card_draw.rounded_rectangle((48, 48, AVATAR_SIZE - 48, AVATAR_SIZE - 48), radius=180, outline=(255, 255, 255, 28), width=2)
+    canvas.alpha_composite(card)
 
-    draw.ellipse((140, 140, AVATAR_SIZE - 140, AVATAR_SIZE - 140), fill=(239, 239, 237, 255))
-    draw.ellipse((140, 140, AVATAR_SIZE - 140, AVATAR_SIZE - 140), outline=(18, 18, 18, 28), width=2)
-    draw_nexus_mark(draw, (center, center), 252)
+    draw.ellipse((178, 178, AVATAR_SIZE - 178, AVATAR_SIZE - 178), fill=(22, 29, 38, 255))
+    draw.ellipse((178, 178, AVATAR_SIZE - 178, AVATAR_SIZE - 178), outline=(255, 255, 255, 20), width=2)
+    draw_nexus_mark(
+        draw,
+        (center, center),
+        232,
+        primary=(242, 244, 247, 255),
+        soft=(118, 126, 138, 180),
+        inner_soft=(88, 96, 108, 148),
+    )
 
     for output in AVATAR_OUTS:
         canvas.save(output)
@@ -431,7 +451,8 @@ def save_gif(frames, output_path):
 
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
-    generate_hero_card()
+    generate_hero_card("light")
+    generate_hero_card("dark")
     generate_avatar()
     light_frames = generate_motion_frames("light")
     dark_frames = generate_motion_frames("dark")

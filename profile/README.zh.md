@@ -1,5 +1,9 @@
 <p align="center">
-  <img alt="Nexus Research Lab title card" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-monochrome.png" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-light.png" />
+    <img alt="可随主题切换的 Nexus Research Lab 标题图" src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-hero-light.png" />
+  </picture>
 </p>
 
 <p align="center">
