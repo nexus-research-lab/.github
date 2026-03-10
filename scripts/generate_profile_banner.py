@@ -32,8 +32,8 @@ def fit_text(draw, text, font_name, max_size, min_size, max_width):
     return font(font_name, min_size)
 
 
-def make_canvas(size):
-    return Image.new("RGBA", size, (0, 0, 0, 0))
+def make_canvas(size, color=(0, 0, 0, 0)):
+    return Image.new("RGBA", size, color)
 
 
 def add_card(canvas, box, radius=34):
@@ -137,6 +137,13 @@ def draw_stage(draw, x, y, label, label_y, pulse=0.0):
     draw.text((x, label_y), label, font=font("IBMPlexMono-Regular.ttf", 18), fill=(92, 92, 92, 255), anchor="mm")
 
 
+def draw_endpoint(draw, x, y, label, label_y):
+    draw.ellipse((x - 15, y - 15, x + 15, y + 15), fill=(245, 245, 243, 255))
+    draw.ellipse((x - 15, y - 15, x + 15, y + 15), outline=(18, 18, 18, 220), width=3)
+    draw.ellipse((x - 9, y - 9, x + 9, y + 9), outline=(18, 18, 18, 180), width=2)
+    draw.text((x, label_y), label, font=font("IBMPlexMono-Regular.ttf", 18), fill=(92, 92, 92, 255), anchor="mm")
+
+
 def draw_hub(draw, center, phase):
     x, y = center
     outer = 66 + int(round(3 * sin(phase * 2 * pi)))
@@ -149,8 +156,8 @@ def draw_hub(draw, center, phase):
     draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=outline, width=4)
     draw.rounded_rectangle((x - mid, y - mid, x + mid, y + mid), radius=20, outline=outline, width=4)
     draw_diamond(draw, center, 58, outline, 4)
-    draw.rounded_rectangle((x - 52, y - 34, x + 52, y + 40), radius=18, fill=card_fill)
-    draw.text((x, y - 12), "NEXUS", font=font("Outfit-Bold.ttf", 28), fill=outline, anchor="mm")
+    draw.rounded_rectangle((x - 54, y - 34, x + 54, y + 40), radius=18, fill=card_fill)
+    draw.text((x, y - 12), "CORE", font=font("Outfit-Bold.ttf", 28), fill=outline, anchor="mm")
     draw.text((x, y + 22), "HUB", font=font("IBMPlexMono-Regular.ttf", 18), fill=(82, 82, 82, 255), anchor="mm")
 
 
@@ -226,14 +233,14 @@ def generate_motion_frames():
 
     for frame_index in range(FRAMES):
         phase = frame_index / FRAMES
-        canvas = make_canvas((WIDTH, MOTION_HEIGHT))
+        canvas = make_canvas((WIDTH, MOTION_HEIGHT), (246, 248, 250, 255))
         add_card(canvas, card_box, radius=34)
         draw = ImageDraw.Draw(canvas)
 
         draw.line((96, stage_y, hub[0] - 82, stage_y), fill=(30, 30, 30, 150), width=3)
-        draw.line((hub[0] + 82, stage_y, split[0], split[1]), fill=(30, 30, 30, 150), width=3)
-        draw.line((split[0], split[1], human[0], human[1]), fill=(30, 30, 30, 150), width=3)
-        draw.line((split[0], split[1], ai[0], ai[1]), fill=(30, 30, 30, 150), width=3)
+        draw.line((hub[0] + 82, stage_y, split[0], split[1]), fill=(30, 30, 30, 132), width=2)
+        draw.line((split[0], split[1], human[0], human[1]), fill=(30, 30, 30, 132), width=2)
+        draw.line((split[0], split[1], ai[0], ai[1]), fill=(30, 30, 30, 132), width=2)
 
         draw.line((96, 108, 1344, 108), fill=(10, 10, 10, 18), width=1)
         draw.text((96, 78), "SIGNAL FLOW THROUGH THE NEXUS HUB", font=font("IBMPlexMono-Regular.ttf", 18), fill=(96, 96, 96, 255))
@@ -242,8 +249,8 @@ def generate_motion_frames():
             pulse_strength = max(0.0, sin((phase * 2 * pi) - idx * 0.65)) * 0.55
             draw_stage(draw, x, stage_y, labels[idx], label_y, pulse_strength)
 
-        draw_stage(draw, human[0], human[1], "HUMAN", 120, 0.2)
-        draw_stage(draw, ai[0], ai[1], "AI", 318, 0.2)
+        draw_endpoint(draw, human[0], human[1], "HUMAN", 120)
+        draw_endpoint(draw, ai[0], ai[1], "AI", 318)
         draw_hub(draw, hub, phase)
 
         for offset in (0.08, 0.36, 0.64):
