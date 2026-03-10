@@ -41,11 +41,15 @@
 ## Signal Motion
 
 <p align="center">
-  <img alt="Monochrome motion diagram showing five engineering stages converging into the Nexus hub and flowing bidirectionally between human and AI collaboration." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-monochrome.gif" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-dark.gif" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-light.gif" />
+    <img alt="Theme-aware motion diagram showing the software chain routing through the Nexus AI core hub into human and AI collaboration." src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-system-motion-light.gif" />
+  </picture>
 </p>
 
 <p align="center">
-  <sub>Five engineering stages converge into the Nexus hub, where human and AI workflows connect and return.</sub>
+  <sub>Theme-aware system motion showing the full software chain routing through the Nexus AI core hub into human-AI collaboration.</sub>
 </p>
 
 ## Entry Points
