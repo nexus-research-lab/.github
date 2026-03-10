@@ -1,50 +1,66 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/nexus-research-lab/.github/main/assets/nexus-profile-banner.gif" alt="Animated Nexus Research Lab banner" />
+</p>
+
 <h1 align="center">Nexus Research Lab</h1>
 
-<p align="center"><strong>连接研究、系统与智能 / Connecting research, systems, and intelligence</strong></p>
+<p align="center">
+  <strong>连接研究、系统与智能</strong><br />
+  <strong>Connecting research, systems, and intelligence</strong>
+</p>
 
 <p align="center">
   开放研究、公开代码、可执行的想法。<br />
   Open research, public code, and executable ideas.
 </p>
 
----
+<p align="center">
+  <code>agents</code>
+  <code>systems</code>
+  <code>memory</code>
+  <code>interfaces</code>
+  <code>research infra</code>
+</p>
 
-## 我们是谁 / Who We Are
+<table>
+  <tr>
+    <td valign="top">
+      <strong>中文</strong><br /><br />
+      Nexus Research Lab 是一个面向 AI 系统、研究基础设施与知识接口的开放实验室。<br />
+      我们把仓库视为研究产物，把原型、工具和实验记录直接公开出来。<br /><br />
+      我们关注的不只是模型本身，也包括模型如何接入工具、如何形成工作流、如何被人类稳定地使用。
 
-Nexus Research Lab 是一个面向 AI、系统工具与研究基础设施的开放实验室。  
-我们把仓库当作研究产物来建设，而不是只把它们当作代码存放处。
+    </td>
+    <td valign="top">
+      <strong>English</strong><br /><br />
+      Nexus Research Lab is an open lab for AI systems, research infrastructure, and knowledge interfaces.<br />
+      We publish prototypes, tools, and lab notes directly, treating repositories as research artifacts.<br /><br />
+      We care not only about models, but about how they connect to tools, become workflows, and stay usable for real people.
 
-Nexus Research Lab is an open lab for AI systems, tooling, and research infrastructure.  
-We treat repositories as research artifacts, not just places to store code.
+    </td>
+  </tr>
+</table>
 
-## 研究方向 / Research Areas
+## Research Threads / 研究线程
 
-- 智能体系统与工作流 / Agent systems and workflows
-- 研究基础设施与开发工具 / Research infrastructure and developer tools
-- 知识系统、记忆与检索接口 / Knowledge systems, memory, and retrieval interfaces
-- 人机协作与实验性交互 / Human-AI collaboration and experimental interfaces
-- 开源原型、数据集与实验记录 / Open-source prototypes, datasets, and lab notes
+| Thread | Direction |
+| --- | --- |
+| Agent systems | 智能体系统、编排与执行链路 / Agents, orchestration, and execution loops |
+| Knowledge interfaces | 记忆、检索、上下文管理 / Memory, retrieval, and context management |
+| Research infrastructure | 实验平台、开发工具、自动化基础设施 / Experiment platforms, developer tooling, and automation |
+| Human-AI workflows | 人机协作、操作界面、真实使用场景 / Collaboration patterns, interfaces, and real-world usage |
 
-## 我们如何工作 / How We Work
+## Operating Mode / 工作方式
 
-- 尽可能在公开环境中构建与迭代 / Build and iterate in public when possible
-- 偏好简单、透明、可检查的系统 / Prefer simple, transparent, inspectable systems
-- 尽早发布实验，不等“完全成熟” / Publish experiments early instead of waiting for perfection
-- 用真实项目验证想法，而不是只停留在概念层 / Validate ideas through working artifacts, not abstract claims
+- Build in public when possible / 尽可能在公开环境中构建与迭代
+- Prefer simple, inspectable systems / 偏好简单、透明、可检查的系统
+- Ship experiments before they look finished / 在“看起来还没完全完成”之前先发布实验
+- Validate ideas with working artifacts / 用可运行的产物验证想法，而不是只讲概念
 
-## 你可以从这里开始 / Start Here
+## Entry Points / 开始阅读
 
-- 查看下方置顶仓库，了解当前最重要的工作 / Explore the pinned repositories below for the best entry points
-- 浏览组织首页，跟进最新公开项目 / Browse the organization for the latest public projects
-- 如果某些项目看起来仍在演化中，这是正常状态 / If some projects look unfinished, that is expected: this lab works in motion
+- [Organization overview](https://github.com/nexus-research-lab)
+- [Repositories](https://github.com/orgs/nexus-research-lab/repositories)
+- Pinned repositories below are the best starting points / 下方置顶仓库是最好的入口
 
-## 联系与链接 / Links
-
-- Organization / 组织主页: https://github.com/nexus-research-lab
-- Website / 网站: coming soon
-- Discussions / 讨论区: coming soon
-- Contact / 联系方式: coming soon
-
----
-
-<sub>Research in progress. Interfaces in motion. Systems under active construction.</sub>
+> Research in progress. Interfaces in motion. Systems under active construction.
