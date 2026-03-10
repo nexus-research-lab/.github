@@ -10,11 +10,13 @@ FONT_DIR = Path("/Users/berhand/.agents/skills/canvas-design/canvas-fonts")
 
 HERO_OUT = ASSETS / "nexus-profile-hero-monochrome.png"
 MOTION_OUT = ASSETS / "nexus-system-motion-monochrome.gif"
+AVATAR_OUTS = [ASSETS / "nexus-avatar-final.png", ASSETS / "nexus-avatar.png"]
 
 WIDTH = 1440
 HERO_HEIGHT = 460
 MOTION_HEIGHT = 420
 FRAMES = 24
+AVATAR_SIZE = 1024
 
 
 def font(name, size):
@@ -41,8 +43,8 @@ def add_card(canvas, box, radius=34):
 
     shadow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     shadow_draw = ImageDraw.Draw(shadow)
-    shadow_draw.rounded_rectangle((0, 0, width, height), radius=radius, fill=(0, 0, 0, 20))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(16))
+    shadow_draw.rounded_rectangle((0, 0, width, height), radius=radius, fill=(0, 0, 0, 14))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(18))
     canvas.alpha_composite(shadow, (x0, y0 + 8))
 
     card = Image.new("RGBA", (width, height), (245, 245, 243, 255))
@@ -50,8 +52,8 @@ def add_card(canvas, box, radius=34):
     card_draw.rounded_rectangle(
         (0, 0, width - 1, height - 1),
         radius=radius,
-        outline=(26, 26, 26, 70),
-        width=2,
+        outline=(26, 26, 26, 44),
+        width=1,
     )
     canvas.alpha_composite(card, (x0, y0))
 
@@ -67,23 +69,27 @@ def draw_nexus_mark(draw, center, radius):
     outer = radius
     inner = int(radius * 0.66)
     diamond = int(radius * 0.78)
-    soft = (90, 90, 90, 180)
+    outer_width = max(3, int(radius * 0.055))
+    inner_width = max(2, int(radius * 0.025))
+    frame_width = max(4, int(radius * 0.075))
+    node_radius = max(8, int(radius * 0.09))
+    soft = (90, 90, 90, 165)
     black = (14, 14, 14, 255)
 
-    draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=soft, width=6)
-    draw.ellipse((x - outer + 18, y - outer + 18, x + outer - 18, y + outer - 18), outline=(150, 150, 150, 120), width=3)
+    draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=soft, width=outer_width)
+    draw.ellipse((x - outer + 18, y - outer + 18, x + outer - 18, y + outer - 18), outline=(150, 150, 150, 108), width=inner_width)
     draw.rounded_rectangle(
         (x - inner, y - inner, x + inner, y + inner),
         radius=int(inner * 0.34),
         outline=black,
-        width=8,
+        width=frame_width,
     )
-    draw_diamond(draw, center, diamond, black, 8)
-    draw.line((x - outer, y, x + outer, y), fill=black, width=8)
-    draw.line((x, y - outer, x, y + outer), fill=black, width=8)
+    draw_diamond(draw, center, diamond, black, frame_width)
+    draw.line((x - outer, y, x + outer, y), fill=black, width=frame_width)
+    draw.line((x, y - outer, x, y + outer), fill=black, width=frame_width)
 
     for dx, dy in ((0, -outer), (outer, 0), (0, outer), (-outer, 0)):
-        draw.ellipse((x + dx - 10, y + dy - 10, x + dx + 10, y + dy + 10), fill=black)
+        draw.ellipse((x + dx - node_radius, y + dy - node_radius, x + dx + node_radius, y + dy + node_radius), fill=black)
 
 
 def generate_hero_card():
@@ -118,24 +124,30 @@ def generate_hero_card():
 
 
 def draw_stage(draw, x, y, label, label_y, pulse=0.0):
-    radius = 13 + int(round(pulse * 2))
-    draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=(18, 18, 18, 255))
-    inner = max(4, radius - 7)
-    draw.ellipse((x - inner, y - inner, x + inner, y + inner), fill=(245, 245, 243, 255))
+    radius = 12
+    if pulse > 0:
+        glow_radius = radius + 4
+        draw.ellipse(
+            (x - glow_radius, y - glow_radius, x + glow_radius, y + glow_radius),
+            outline=(24, 24, 24, int(38 + pulse * 60)),
+            width=2,
+        )
+    draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=(245, 245, 243, 255))
+    draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=(18, 18, 18, 235), width=4)
     draw.text((x, label_y), label, font=font("IBMPlexMono-Regular.ttf", 18), fill=(92, 92, 92, 255), anchor="mm")
 
 
 def draw_hub(draw, center, phase):
     x, y = center
-    outer = 68 + int(round(4 * sin(phase * 2 * pi)))
+    outer = 66 + int(round(3 * sin(phase * 2 * pi)))
     mid = 52
     outline = (16, 16, 16, 255)
-    soft = (24, 24, 24, 44)
+    soft = (24, 24, 24, 24)
 
-    draw.ellipse((x - outer - 20, y - outer - 20, x + outer + 20, y + outer + 20), outline=soft, width=3)
-    draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=outline, width=6)
-    draw.rounded_rectangle((x - mid, y - mid, x + mid, y + mid), radius=20, outline=outline, width=5)
-    draw_diamond(draw, center, 58, outline, 5)
+    draw.ellipse((x - outer - 18, y - outer - 18, x + outer + 18, y + outer + 18), outline=soft, width=2)
+    draw.ellipse((x - outer, y - outer, x + outer, y + outer), outline=outline, width=4)
+    draw.rounded_rectangle((x - mid, y - mid, x + mid, y + mid), radius=20, outline=outline, width=4)
+    draw_diamond(draw, center, 58, outline, 4)
     draw.text((x, y - 10), "NEXUS", font=font("Outfit-Bold.ttf", 30), fill=outline, anchor="mm")
     draw.text((x, y + 22), "HUB", font=font("IBMPlexMono-Regular.ttf", 20), fill=(82, 82, 82, 255), anchor="mm")
 
@@ -169,9 +181,28 @@ def point_on_polyline(points, progress):
 def draw_pulse(draw, point, radius, alpha):
     x, y = point
     fill = (12, 12, 12, alpha)
-    glow = (40, 40, 40, max(0, alpha // 4))
-    draw.ellipse((x - radius - 6, y - radius - 6, x + radius + 6, y + radius + 6), fill=glow)
+    glow = (40, 40, 40, max(0, alpha // 6))
+    draw.ellipse((x - radius - 4, y - radius - 4, x + radius + 4, y + radius + 4), fill=glow)
     draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=fill)
+
+
+def generate_avatar():
+    canvas = Image.new("RGBA", (AVATAR_SIZE, AVATAR_SIZE), (244, 244, 242, 255))
+    draw = ImageDraw.Draw(canvas)
+    center = AVATAR_SIZE // 2
+
+    halo = Image.new("RGBA", (AVATAR_SIZE, AVATAR_SIZE), (0, 0, 0, 0))
+    halo_draw = ImageDraw.Draw(halo)
+    halo_draw.ellipse((116, 116, AVATAR_SIZE - 116, AVATAR_SIZE - 116), fill=(0, 0, 0, 10))
+    halo = halo.filter(ImageFilter.GaussianBlur(24))
+    canvas.alpha_composite(halo)
+
+    draw.ellipse((140, 140, AVATAR_SIZE - 140, AVATAR_SIZE - 140), fill=(239, 239, 237, 255))
+    draw.ellipse((140, 140, AVATAR_SIZE - 140, AVATAR_SIZE - 140), outline=(18, 18, 18, 28), width=2)
+    draw_nexus_mark(draw, (center, center), 252)
+
+    for output in AVATAR_OUTS:
+        canvas.save(output)
 
 
 def generate_motion_frames():
@@ -197,12 +228,12 @@ def generate_motion_frames():
         add_card(canvas, card_box, radius=34)
         draw = ImageDraw.Draw(canvas)
 
-        draw.line((96, stage_y, hub[0] - 82, stage_y), fill=(30, 30, 30, 180), width=4)
-        draw.line((hub[0] + 82, stage_y, split[0], split[1]), fill=(30, 30, 30, 180), width=4)
-        draw.line((split[0], split[1], human[0], human[1]), fill=(30, 30, 30, 180), width=4)
-        draw.line((split[0], split[1], ai[0], ai[1]), fill=(30, 30, 30, 180), width=4)
+        draw.line((96, stage_y, hub[0] - 82, stage_y), fill=(30, 30, 30, 150), width=3)
+        draw.line((hub[0] + 82, stage_y, split[0], split[1]), fill=(30, 30, 30, 150), width=3)
+        draw.line((split[0], split[1], human[0], human[1]), fill=(30, 30, 30, 150), width=3)
+        draw.line((split[0], split[1], ai[0], ai[1]), fill=(30, 30, 30, 150), width=3)
 
-        draw.line((96, 108, 1344, 108), fill=(10, 10, 10, 24), width=2)
+        draw.line((96, 108, 1344, 108), fill=(10, 10, 10, 18), width=1)
         draw.text((96, 78), "SIGNAL FLOW THROUGH THE NEXUS HUB", font=font("IBMPlexMono-Regular.ttf", 18), fill=(96, 96, 96, 255))
 
         for idx, x in enumerate(stage_x):
@@ -213,16 +244,15 @@ def generate_motion_frames():
         draw_stage(draw, ai[0], ai[1], "AI", 318, 0.2)
         draw_hub(draw, hub, phase)
 
-        for offset in (0.00, 0.18, 0.36, 0.54):
+        for offset in (0.08, 0.36, 0.64):
             progress = (phase + offset) % 1.0
             pulse = point_on_polyline(incoming_points, progress)
-            alpha = int(220 - offset * 160)
-            draw_pulse(draw, pulse, 8, alpha)
+            draw_pulse(draw, pulse, 6, 190)
 
         for path, offset in ((human_points, 0.08), (ai_points, 0.56)):
             progress = (phase + offset) % 1.0
             pulse = point_on_polyline(path, progress)
-            draw_pulse(draw, pulse, 7, 210)
+            draw_pulse(draw, pulse, 6, 185)
 
         frames.append(canvas)
 
@@ -249,6 +279,7 @@ def save_gif(frames):
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     generate_hero_card()
+    generate_avatar()
     save_gif(generate_motion_frames())
 
 
