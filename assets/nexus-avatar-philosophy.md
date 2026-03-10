@@ -1,0 +1,11 @@
+# Nexus Lattice
+
+The avatar for Nexus Research Lab should not behave like a conventional startup logo. It should feel like a scientific insignia from an institution studying how intelligence, memory, tools, and interfaces converge. The visual language is built around a controlled nexus: a dense center, orbiting nodes, and radial paths that imply connection without collapsing into a generic network diagram. Every mark should feel meticulously crafted, the product of deep expertise rather than decorative trend-following.
+
+Form is the primary carrier of meaning. The composition should resolve into a stable circular field so it remains legible in GitHub's cropped avatar frame, yet inside that field it should create tension between order and emergence. A central vertical structure suggests an abstract "N" without becoming a literal monogram. Rings, node-points, and directional vectors imply a lab where systems meet, branch, recombine, and are studied with painstaking attention.
+
+Color should communicate technical seriousness with one unmistakable signal accent. The base palette is near-black graphite, cold slate, and muted steel, establishing an institutional, research-grade tone. A concentrated electric cyan glow marks the nexus itself: not as spectacle, but as evidence of active energy inside the system. The work must appear meticulously tuned, with gradients, shadows, and micro-contrast handled so carefully that the icon reads as crisp at small size and sophisticated at full resolution.
+
+Rhythm comes from repeated calibrated structures: concentric rings, measured node spacing, and axial symmetry interrupted by slight asymmetrical offsets. These deviations are important. They imply live experimentation rather than frozen branding. The final result should look patiently engineered, labored over with care, and refined until every proportion feels inevitable.
+
+Text should be absent from the final avatar. Meaning must emerge through geometry, spacing, and signal. The icon should quietly suggest nexus, research, circuitry, constellation, and laboratory instrumentation all at once. It should feel like the emblem of an active AI research lab, crafted at a master level and polished until nothing extraneous remains.
