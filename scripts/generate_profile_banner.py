@@ -11,7 +11,6 @@ FRAMES = 18
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
 FONT_DIR = Path("/Users/berhand/.agents/skills/canvas-design/canvas-fonts")
-CN_FONT = Path("/System/Library/Fonts/Hiragino Sans GB.ttc")
 
 
 @dataclass(frozen=True)
@@ -238,13 +237,11 @@ def build_frame(frame_index: int, theme: Theme):
     title_font = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Bold.ttf"), 54)
     mono_font = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Regular.ttf"), 20)
     mono_small = ImageFont.truetype(str(FONT_DIR / "IBMPlexMono-Regular.ttf"), 16)
-    cn_font = ImageFont.truetype(str(CN_FONT), 27)
 
     draw.text((84, 82), "NEXUS", font=title_font, fill=rgba(theme.text_primary, 250))
     draw.text((84, 134), "RESEARCH LAB", font=title_font, fill=rgba(theme.text_accent, 232))
-    draw.text((84, 184), "the ai-centered hub for software creation", font=mono_font, fill=rgba(theme.text_secondary, 238))
-    draw.text((84, 221), "道枢：以 AI 为核心枢纽，打通端到端软件开发全链路", font=cn_font, fill=rgba(theme.text_primary, 232))
-    draw.text((84, 296), "full-chain hub  |  human <-> ai symbiosis", font=mono_small, fill=rgba(theme.strip_text, 220))
+    draw.text((84, 184), "the ai-centered hub for full-chain software creation", font=mono_font, fill=rgba(theme.text_secondary, 238))
+    draw.text((84, 296), "full-chain hub  |  human-ai co-creation", font=mono_small, fill=rgba(theme.strip_text, 220))
 
     for label, (x, y) in stages:
         draw_node(image, draw, (x, y), theme)
